@@ -55,6 +55,7 @@ func combinedJWTMiddleware(next http.Handler) http.Handler {
 		token, _, err := jwtauth.FromContext(r.Context())
 
 		if err != nil {
+			log.Error("An error occurred getting the token from the context: ", err)
 			http.Error(w, http.StatusText(401), 401)
 			return
 		}
