@@ -56,22 +56,12 @@ func combinedJWTMiddleware(next http.Handler) http.Handler {
 
 		if err != nil {
 			log.Error("An error occurred getting the token from the context: ", err)
-			http.Error(w, http.StatusText(401), 401)
+			badAuthResponse(w, r)
 			return
 		}
 
 		if token == nil || !token.Valid {
-			if r.Header.Get("content-type") == "application/json" {
-				log.Error("No token is present and identified as a JSON request")
-				log.Error("Request identified as ", r.Header.Get("content-type"))
-				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-				return
-			}
-
-			//For interactive Sessions, re-direct to / for login
-			log.Info("No token present, but it appears to be an interactive session. Redirectiong to / to login")
-			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-			return
+			badAuthResponse(w, r)
 		}
 
 		// Token is authenticated, pass it through
@@ -97,4 +87,18 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fs.ServeHTTP(w, r)
 	}))
+}
+
+func badAuthResponse(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("content-type") == "application/json" {
+		log.Error("No token is present and identified as a JSON request")
+		log.Error("Request identified as ", r.Header.Get("content-type"))
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	//For interactive Sessions, re-direct to / for login
+	log.Info("No token present, but it appears to be an interactive session. Redirectiong to / to login")
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return
 }
