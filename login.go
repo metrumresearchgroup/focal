@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/metrumresearchgroup/tekmor"
@@ -23,8 +24,30 @@ func loginProcessorController(w http.ResponseWriter, r *http.Request) {
 //The whole purpose is to provide a login mechanism for interactive avenues where a cookie will be used
 //This adheres to the chi authjwt model interactively
 func processFormLogin(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("This looks like a form login!"))
+	r.ParseForm()
+
+	Identity := tekmor.Identity{
+		Username: r.FormValue("username"),
+		Password: r.FormValue("password"),
+	}
+
+	Details, err := Identity.Authenticate()
+
+	if err != nil {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+	}
+
+	_, token, err := ta.Encode(jwt.MapClaims{"username": Details.Username, "home": Details.Home, "group": Details.Group})
+
+	Cewkie := http.Cookie{
+		Name:    "jwt",
+		Value:   token,
+		Expires: time.Now().Add(24 * time.Hour),
+	}
+
+	http.SetCookie(w, &Cewkie)
+
+	http.Redirect(w, r, "/access", http.StatusTemporaryRedirect)
 }
 
 func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +74,7 @@ func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, token, err := ta.Encode(jwt.MapClaims{"username": Details.Username, "home": Details.Home, "group": Details.Group})
+	_, token, _ := ta.Encode(jwt.MapClaims{"username": Details.Username, "home": Details.Home, "group": Details.Group})
 
 	Response := res{
 		Token: token,

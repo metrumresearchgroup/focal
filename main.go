@@ -49,8 +49,9 @@ func setup() {
 //or the absence of a token in session trigger a redirect to /login
 
 //For API requests, we'll use the jwtauth.Authenticator middleware.
-func interactiveSessionMiddleware(next http.Handler) http.Handler {
+func combinedJWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		token, _, err := jwtauth.FromContext(r.Context())
 
 		if err != nil {
@@ -59,7 +60,13 @@ func interactiveSessionMiddleware(next http.Handler) http.Handler {
 		}
 
 		if token == nil || !token.Valid {
-			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			if r.Header.Get("content-type") == "application/json" {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			//For interactive Sessions, re-direct to / for login
+			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		}
 
 		// Token is authenticated, pass it through
