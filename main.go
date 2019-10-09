@@ -98,7 +98,7 @@ func badAuthResponse(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//For interactive Sessions, re-direct to / for login
-	log.Info("No token present, but it appears to be an interactive session. Redirectiong to / to login")
+	log.Info("No token present, but it appears to be an interactive session. Redirecting to / to login")
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	return
 }

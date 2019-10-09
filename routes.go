@@ -34,11 +34,14 @@ func routes() chi.Router {
 		//Covers both JSON and Non requests :3
 		r.Use(combinedJWTMiddleware)
 
-		r.Get("/access", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("Well hello"))
-		})
+		r.Get("/access", listingController)
+		r.Post("/access", listingController)
 	})
 
 	return r
+}
+
+func listingController(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Well hello"))
 }
