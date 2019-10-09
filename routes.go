@@ -34,7 +34,7 @@ func routes() chi.Router {
 
 	//Iterate over config
 	for _, v := range directory {
-		r.Get("/"+strings.ToLower(v.Name), generateProxyHandler(v))
+		r.Get("/"+strings.ToLower(v.Name)+"*", generateProxyHandler(v))
 	}
 
 	r.Group(func(r chi.Router) {
@@ -101,19 +101,28 @@ func generateProxyHandler(d Direction) func(w http.ResponseWriter, r *http.Reque
 
 		// 	proxy.ServeHTTP(w, r)
 		// }
-		proxy(d.Target, w, r)
+		proxy(d, w, r)
 	}
 }
 
-func proxy(target string, w http.ResponseWriter, r *http.Request) {
-	u, _ := url.Parse(target)
-
-	proxy := httputil.NewSingleHostReverseProxy(u)
+func proxy(d Direction, w http.ResponseWriter, r *http.Request) {
+	u, _ := url.Parse(d.Target)
 
 	r.URL.Host = u.Host
 	r.URL.Scheme = u.Scheme
 	r.Host = u.Host
-	r.URL.Path = "/"
+
+	pieces := strings.Split(r.URL.Path, "/")
+	curPath := pieces[len(pieces)-1]
+
+	if strings.ToLower(curPath) == strings.ToLower(d.Name) {
+		//This it he top level of the magical rainbow road
+		r.URL.Path = "/"
+	} else {
+		r.URL.Path = strings.Replace(r.URL.Path, "/"+strings.ToLower(d.Name), "", 1)
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(u)
 
 	proxy.ServeHTTP(w, r)
 
