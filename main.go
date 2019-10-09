@@ -10,12 +10,10 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
-	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
-var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 var ta *jwtauth.JWTAuth
 var port int = 9666
 var listenDirective string
