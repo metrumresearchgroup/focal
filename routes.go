@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -11,7 +10,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/jwtauth"
-	"gopkg.in/yaml.v2"
 )
 
 func routes() chi.Router {
@@ -30,8 +28,6 @@ func routes() chi.Router {
 
 	r.Post("/login", loginProcessorController)
 
-	r.Get("/test", serializationController)
-
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(ta))
 
@@ -48,42 +44,12 @@ func routes() chi.Router {
 
 	})
 
-	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-		route = strings.Replace(route, "/*/", "/", -1)
-		fmt.Printf("%s %s\n", method, route)
-		return nil
-	}
-
-	if err := chi.Walk(r, walkFunc); err != nil {
-		fmt.Printf("Logging err: %s\n", err.Error())
-	}
-
 	return r
 }
 
 func listingController(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Well hello"))
-}
-
-func serializationController(w http.ResponseWriter, r *http.Request) {
-	Directions := Directions{
-		{
-			Name:   "google",
-			Target: "http://www.google.com",
-		},
-		{
-			Name:   "yahoo",
-			Target: "http://www.yahoo.com",
-		},
-	}
-
-	serialized, err := yaml.Marshal(Directions)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.Write(serialized)
 }
 
 func generateProxyHandler(d Direction) func(w http.ResponseWriter, r *http.Request) {
