@@ -26,8 +26,6 @@ func loginProcessorController(w http.ResponseWriter, r *http.Request) {
 func processFormLogin(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
-	log.Debug("Form values are: ", r.Form)
-
 	Identity := tekmor.Identity{
 		Username: r.FormValue("username"),
 		Password: r.FormValue("password"),

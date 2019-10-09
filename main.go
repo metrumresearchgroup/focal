@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
 	"github.com/gorilla/sessions"
+	log "github.com/sirupsen/logrus"
 )
 
 var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
@@ -61,12 +61,16 @@ func combinedJWTMiddleware(next http.Handler) http.Handler {
 
 		if token == nil || !token.Valid {
 			if r.Header.Get("content-type") == "application/json" {
+				log.Error("No token is present and identified as a JSON request")
+				log.Error("Request identified as ", r.Header.Get("content-type"))
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
 
 			//For interactive Sessions, re-direct to / for login
+			log.Info("No token present, but it appears to be an interactive session. Redirectiong to / to login")
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			return
 		}
 
 		// Token is authenticated, pass it through
