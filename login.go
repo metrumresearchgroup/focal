@@ -53,6 +53,16 @@ func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
 
 	_, token, err := ta.Encode(jwt.MapClaims{"username": Details.Username, "home": Details.Home, "group": Details.Group})
 
-	w.Write([]byte(token))
+	Response := res{
+		Token: token,
+	}
+
+	serialized, err := json.Marshal(Response)
+
+	if err != nil {
+		http.Error(w, "Unable to serialize content for response", http.StatusInternalServerError)
+	}
+
+	w.Write(serialized)
 
 }
