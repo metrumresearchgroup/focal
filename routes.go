@@ -32,11 +32,6 @@ func routes() chi.Router {
 
 	r.Get("/test", serializationController)
 
-	//Iterate over config
-	for _, v := range directory {
-		r.Get("/"+strings.ToLower(v.Name)+"*", generateProxyHandler(v))
-	}
-
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(ta))
 
@@ -45,6 +40,11 @@ func routes() chi.Router {
 
 		r.Get("/access", listingController)
 		r.Post("/access", listingController)
+
+		//Iterate over config
+		for _, v := range directory {
+			r.Get("/"+strings.ToLower(v.Name)+"*", generateProxyHandler(v))
+		}
 
 	})
 
