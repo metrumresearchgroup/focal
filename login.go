@@ -6,6 +6,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/metrumresearchgroup/tekmor"
+	log "github.com/sirupsen/logrus"
 )
 
 //Do the operation of logging in. Split actions based on content type provided.
@@ -45,6 +46,7 @@ func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
 	Details, err := Identity.Authenticate()
 
 	if err != nil {
+		log.Error(err)
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
