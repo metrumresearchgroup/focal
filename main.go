@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,12 +12,15 @@ import (
 	"github.com/go-chi/jwtauth"
 	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 var ta *jwtauth.JWTAuth
 var port int = 9666
 var listenDirective string
+var directory Directions
+var directoryFile string = "directory.yml"
 
 func main() {
 	setup()
@@ -40,8 +44,35 @@ func setup() {
 		port = int(p)
 	}
 
+	//Look for configured variable for loading the directory file
+	if os.Getenv("DIRECTORY_FILE") != "" {
+		directoryFile = os.Getenv("DIRECTORY_FILE")
+	}
+
+	buildDirectory()
+
 	listenDirective = ":" + strconv.Itoa(port)
 	log.Print(listenDirective)
+}
+
+func buildDirectory() {
+	if _, err := os.Stat(directoryFile); err == nil {
+		log.Info("Located a directory file to parse")
+
+		contents, err := ioutil.ReadFile(directoryFile)
+		if err != nil {
+			log.Error(err)
+			directory = Directions{}
+			return
+		}
+
+		directory = Directions{}
+
+		err = yaml.Unmarshal(contents, &directory)
+		if err != nil {
+			panic("Unable to parse the listings! Giving up in a cowardly fashion")
+		}
+	}
 }
 
 //This middleware is used for interactive targets (IE Grafana) that are

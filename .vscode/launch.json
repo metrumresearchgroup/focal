@@ -12,7 +12,8 @@
             "program": "${fileDirname}",
             "env": {
                 "SESSION_KEY" : "iamabannana",
-                "TOKEN_SECRET" : "myspoonistoobig"
+                "TOKEN_SECRET" : "myspoonistoobig",
+                "DIRECTORY_FILE" : ".example.directory.yml"
             },
             "args": []
         }
