@@ -31,7 +31,7 @@ func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
 
 	type res struct {
-		Token string `json:"string"`
+		Token string `json:"token"`
 	}
 
 	Identity := tekmor.Identity{}
