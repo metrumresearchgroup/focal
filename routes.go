@@ -88,19 +88,6 @@ func serializationController(w http.ResponseWriter, r *http.Request) {
 
 func generateProxyHandler(d Direction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//	origin, _ := url.Parse(d.Target)
-
-		// 	director := func(req *http.Request) {
-		// 		req.Header.Add("X-Forwarded-Host", req.Host)
-		// 		req.Header.Add("X-Origin-Host", origin.Host)
-		// 		req.URL.Scheme = "http"
-		// 		req.URL.Host = origin.Host
-		// 	}
-
-		// 	proxy := &httputil.ReverseProxy{Director: director}
-
-		// 	proxy.ServeHTTP(w, r)
-		// }
 		proxy(d, w, r)
 	}
 }
@@ -115,6 +102,7 @@ func proxy(d Direction, w http.ResponseWriter, r *http.Request) {
 	pieces := strings.Split(r.URL.Path, "/")
 	curPath := pieces[len(pieces)-1]
 
+	//Handle proxy passing and only pass non top level paths to the downstream
 	if strings.ToLower(curPath) == strings.ToLower(d.Name) {
 		//This it he top level of the magical rainbow road
 		r.URL.Path = "/"
