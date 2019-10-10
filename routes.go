@@ -26,6 +26,8 @@ func routes() chi.Router {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
+	r.Get("/", displayLoginController)
+
 	r.Post("/login", loginProcessorController)
 
 	r.Group(func(r chi.Router) {
@@ -39,7 +41,7 @@ func routes() chi.Router {
 
 		//Iterate over config
 		for _, v := range directory {
-			r.Get("/"+strings.ToLower(v.Name)+"*", generateProxyHandler(v))
+			r.HandleFunc("/"+strings.ToLower(v.Name)+"*", generateProxyHandler(v))
 		}
 
 	})

@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -23,10 +22,6 @@ var directoryFile string = "directory.yml"
 func main() {
 	setup()
 	r := routes()
-	workDir, _ := os.Getwd()
-	filesDir := filepath.Join(workDir, "static")
-	FileServer(r, "/", http.Dir(filesDir))
-
 	http.ListenAndServe(listenDirective, r)
 }
 
