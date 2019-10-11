@@ -15,7 +15,7 @@ const loginPage string = `<html>
 		</div>
 	</div>
 
-	<form method="POST" action="/login" enctype="application/x-www-form-urlencoded">
+	<form method="POST" action="{{.Target}}" enctype="application/x-www-form-urlencoded">
 		<div class="form-group">
 			<label for="username">Username</label>
 			<input type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp" placeholder="root">
@@ -32,5 +32,60 @@ const loginPage string = `<html>
 		<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
 	</div>
+</body>
+</html>`
+
+const backendListing string = `<head>
+<title>Focal Point Application Listing </title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+<div class="container">
+
+<div class="row">
+	<div class="col text-center">
+		<h1> Now In Focus... </h2>
+	</div>
+</div>
+
+<br/>
+<hr/>
+
+<div class="row">
+	<div class="col"></div>
+
+	<div class="col">
+		<table class="table table-striped table-bordered table-hover">
+			<caption>All available endpoints in focus for this proxy</caption>
+			<thead class="thead-dark">
+				<tr>
+				<th scope="col">Application</th>
+				<th scope="col">Endpoint</th>
+				<th scope="col">Type</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{ range .Directory }}
+				<tr>
+				{{ if eq $.RootURL "" }}
+				<td><a href="/{{- .Name -}}">{{ .Name }}</a></td>
+				{{ else }}
+				<td><a href="{{- $.RootURL -}}/{{ .Name }}">{{ .Name }}</a></td>
+				{{ end }}
+				<td>{{ .Name }}</td>
+				<td>{{ .Type }}</td>
+				</tr>
+				{{ end }}
+			</tbody>
+		</table>
+
+	</div>
+
+	<div class="col"></div>
+</div>
+
+
+
 </body>
 </html>`

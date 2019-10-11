@@ -5,9 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 
-	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -18,6 +16,7 @@ var port int = 9666
 var listenDirective string
 var directory Directions
 var directoryFile string = "directory.yml"
+var rootURL string = ""
 
 func main() {
 	setup()
@@ -44,6 +43,13 @@ func setup() {
 
 	buildDirectory()
 
+	//Look for a custom ROOT URL
+	//Defaults to "" so that when appended to /login you'll just get /login
+	//But if a custom root of "/protected" is provided, login will redirect to "/protected/login"
+	if os.Getenv("FOCAL_ROOT") != "" {
+		rootURL = os.Getenv("FOCAL_ROOT")
+	}
+
 	listenDirective = ":" + strconv.Itoa(port)
 	log.Print(listenDirective)
 }
@@ -68,51 +74,6 @@ func buildDirectory() {
 	}
 }
 
-//This middleware is used for interactive targets (IE Grafana) that are
-//completely and blissfully unaware of potential tokens. Here, failures to login
-//or the absence of a token in session trigger a redirect to /login
-
-//For API requests, we'll use the jwtauth.Authenticator middleware.
-func combinedJWTMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		token, _, err := jwtauth.FromContext(r.Context())
-
-		if err != nil {
-			log.Error("An error occurred getting the token from the context: ", err)
-			badAuthResponse(w, r)
-			return
-		}
-
-		if token == nil || !token.Valid {
-			badAuthResponse(w, r)
-		}
-
-		// Token is authenticated, pass it through
-		next.ServeHTTP(w, r)
-	})
-}
-
-// FileServer conveniently sets up a http.FileServer handler to serve
-// static files from a http.FileSystem.
-func FileServer(r chi.Router, path string, root http.FileSystem) {
-	if strings.ContainsAny(path, "{}*") {
-		panic("FileServer does not permit URL parameters.")
-	}
-
-	fs := http.StripPrefix(path, http.FileServer(root))
-
-	if path != "/" && path[len(path)-1] != '/' {
-		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
-		path += "/"
-	}
-	path += "*"
-
-	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fs.ServeHTTP(w, r)
-	}))
-}
-
 func badAuthResponse(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("content-type") == "application/json" {
 		log.Error("No token is present and identified as a JSON request")
@@ -123,6 +84,6 @@ func badAuthResponse(w http.ResponseWriter, r *http.Request) {
 
 	//For interactive Sessions, re-direct to / for login
 	log.Info("No token present, but it appears to be an interactive session. Redirecting to / to login")
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, rootURL+"/", http.StatusTemporaryRedirect)
 	return
 }

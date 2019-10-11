@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -10,6 +11,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/jwtauth"
+	log "github.com/sirupsen/logrus"
 )
 
 func routes() chi.Router {
@@ -50,8 +52,23 @@ func routes() chi.Router {
 }
 
 func listingController(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Well hello"))
+
+	type Request struct {
+		Directory Directions
+		RootURL   string
+	}
+
+	req := Request{
+		Directory: directory,
+		RootURL:   rootURL,
+	}
+
+	t := template.New("listing")
+	t, err := t.Parse(backendListing)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	t.Execute(w, req)
 }
 
 func generateProxyHandler(d Direction) func(w http.ResponseWriter, r *http.Request) {
@@ -82,4 +99,29 @@ func proxy(d Direction, w http.ResponseWriter, r *http.Request) {
 
 	proxy.ServeHTTP(w, r)
 
+}
+
+//This middleware is used for interactive targets (IE Grafana) that are
+//completely and blissfully unaware of potential tokens. Here, failures to login
+//or the absence of a token in session trigger a redirect to /login
+
+//For API requests, we'll use the jwtauth.Authenticator middleware.
+func combinedJWTMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		token, _, err := jwtauth.FromContext(r.Context())
+
+		if err != nil {
+			log.Error("An error occurred getting the token from the context: ", err)
+			badAuthResponse(w, r)
+			return
+		}
+
+		if token == nil || !token.Valid {
+			badAuthResponse(w, r)
+		}
+
+		// Token is authenticated, pass it through
+		next.ServeHTTP(w, r)
+	})
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"net/http"
 	"time"
 
@@ -47,7 +48,7 @@ func processFormLogin(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &Cewkie)
 
-	http.Redirect(w, r, "/access", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, rootURL+"/access", http.StatusTemporaryRedirect)
 }
 
 func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +92,18 @@ func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func displayLoginController(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(loginPage))
+
+	type Response struct {
+		Target string
+	}
+
+	t := template.New("login")
+	t, err := t.Parse(loginPage)
+	if err != nil {
+		http.Error(w, "Unable to render template", http.StatusInternalServerError)
+	}
+
+	t.Execute(w, Response{
+		Target: rootURL + "/login",
+	})
 }
