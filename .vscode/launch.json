@@ -13,8 +13,8 @@
             "env": {
                 "SESSION_KEY" : "iamabannana",
                 "TOKEN_SECRET" : "myspoonistoobig",
-                "DIRECTORY_FILE" : ".example.directory.yml"
-//                "FOCAL_ROOT" : "/focal"
+                "DIRECTORY_FILE" : ".example.directory.yml",
+                "FOCAL_ROOT" : "/focal"
             },
             "args": []
         }
