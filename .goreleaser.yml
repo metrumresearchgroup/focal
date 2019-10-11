@@ -48,7 +48,6 @@ nfpms:
     # Formats to be generated.
     formats:
       - deb
-      - rpm
 
     # Packages your package depends on.
     dependencies:
@@ -70,3 +69,8 @@ nfpms:
     # Default is empty.
     empty_folders:
     - /var/log/focal
+
+    files:
+      "system/environment.file": "/etc/default/focal"
+      "system/focal.service": "/etc/systemd/system/focal.service"
+      ".example.directory.yml": "/etc/focal/directory.yml"

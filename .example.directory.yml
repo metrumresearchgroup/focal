@@ -1,4 +1,2 @@
 - name: google
   upstream: http://www.google.com
-- name: teachers
-  upstream: http://teachers.gov.bd/
