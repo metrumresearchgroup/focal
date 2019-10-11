@@ -4,6 +4,9 @@ before:
   hooks:
     - go mod tidy
 
+snapshot:
+  name_template: 1.{{.Commit}}
+
 builds:
   -
     id: "focal"
@@ -74,3 +77,7 @@ nfpms:
       "system/environment.file": "/etc/default/focal"
       "system/focal.service": "/etc/systemd/system/focal.service"
       ".example.directory.yml": "/etc/focal/directory.yml"
+
+    scripts:
+      preinstall: "system/preinstall.sh"
+      postinstall: "system/postinstall.sh"

@@ -35,7 +35,9 @@ func processFormLogin(w http.ResponseWriter, r *http.Request) {
 	Details, err := Identity.Authenticate()
 
 	if err != nil {
+		log.Error(err)
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
 	}
 
 	_, token, err := ta.Encode(jwt.MapClaims{"username": Details.Username, "home": Details.Home, "group": Details.Group})
