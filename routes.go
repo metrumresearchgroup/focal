@@ -57,10 +57,12 @@ func listingController(w http.ResponseWriter, r *http.Request) {
 
 	type Request struct {
 		Directory Directions
+		RootURL   string
 	}
 
 	req := Request{
 		Directory: directory,
+		RootURL:   rootURL,
 	}
 
 	t := template.New("listing")

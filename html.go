@@ -68,7 +68,11 @@ const backendListing string = `<head>
 			<tbody>
 				{{ range .Directory }}
 				<tr>
-				<td><a href="/{{ .Name }}">{{ .Name }}</a></td>
+				{{ if eq $.RootURL "" }}
+				<td><a href="/{{- .Name -}}">{{ .Name }}</a></td>
+				{{ else }}
+				<td><a href="{{- $.RootURL -}}/{{ .Name }}">{{ .Name }}</a></td>
+				{{ end }}
 				<td>{{ .Name }}</td>
 				<td>{{ .Type }}</td>
 				</tr>

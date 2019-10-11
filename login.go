@@ -48,7 +48,7 @@ func processFormLogin(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &Cewkie)
 
-	http.Redirect(w, r, "/access", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, rootURL+"/access", http.StatusTemporaryRedirect)
 }
 
 func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
