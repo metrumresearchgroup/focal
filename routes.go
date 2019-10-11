@@ -30,8 +30,6 @@ func routes() chi.Router {
 
 	r.Get("/", displayLoginController)
 
-	r.Get("/test", listingController)
-
 	r.Post("/login", loginProcessorController)
 
 	r.Group(func(r chi.Router) {
