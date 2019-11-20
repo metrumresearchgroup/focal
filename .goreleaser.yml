@@ -54,7 +54,6 @@ nfpms:
 
     # Packages your package depends on.
     dependencies:
-      - systemd
       - build-essential
       - libpam0g-dev
       - bash
@@ -76,6 +75,7 @@ nfpms:
     files:
       "system/environment.file": "/etc/default/focal"
       "system/focal.service": "/etc/systemd/system/focal.service"
+      "system/initd.sh" : "/etc/init.d/focal"
       ".example.directory.yml": "/etc/focal/directory.yml"
 
     scripts:
