@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"encoding/json"
@@ -50,7 +50,7 @@ func processFormLogin(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &Cewkie)
 
-	http.Redirect(w, r, rootURL+"/access", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, config.RootURL+"/access", http.StatusTemporaryRedirect)
 }
 
 func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
@@ -106,6 +106,6 @@ func displayLoginController(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t.Execute(w, Response{
-		Target: rootURL + "/login",
+		Target: config.RootURL + "/login",
 	})
 }

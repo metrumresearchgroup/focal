@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"html/template"
@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func routes() chi.Router {
+func Routes(directory Directions) chi.Router {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -58,9 +58,12 @@ func listingController(w http.ResponseWriter, r *http.Request) {
 		RootURL   string
 	}
 
+
+	directory, _  := buildDirectory(&config)
+
 	req := Request{
 		Directory: directory,
-		RootURL:   rootURL,
+		RootURL:   config.RootURL,
 	}
 
 	t := template.New("listing")
@@ -68,7 +71,11 @@ func listingController(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	t.Execute(w, req)
+	err = t.Execute(w, req)
+
+	if err != nil {
+		http.Error(w,err.Error(),501)
+	}
 }
 
 func generateProxyHandler(d Direction) func(w http.ResponseWriter, r *http.Request) {

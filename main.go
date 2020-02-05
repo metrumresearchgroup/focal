@@ -8,15 +8,10 @@ import (
 
 	"github.com/go-chi/jwtauth"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
 
-var ta *jwtauth.JWTAuth
-var port int = 9666
-var listenDirective string
-var directory Directions
-var directoryFile string = "directory.yml"
-var rootURL string = ""
 
 func main() {
 	setup()
@@ -25,7 +20,14 @@ func main() {
 }
 
 func setup() {
-	ta = jwtauth.New("HS256", []byte(os.Getenv("TOKEN_SECRET")), nil)
+
+	viper.SetEnvPrefix("focal")
+	viper.AutomaticEnv()
+
+	token := viper.GetString("TOKEN_SECRET")
+	println(token)
+
+	ta = jwtauth.New("HS256", []byte(viper.GetString("TOKEN_SECRET")), nil)
 
 	if os.Getenv("LISTEN_PORT") != "" {
 		p, err := strconv.ParseInt(os.Getenv("LISTEN_PORT"), 10, 64)
