@@ -1,0 +1,12 @@
+[Unit]
+Description=focal
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+EnvironmentFile=/etc/default/focal
+ExecStart=/usr/local/bin/focal
+
+[Install]
+WantedBy=multi-user.target
