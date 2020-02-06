@@ -1,4 +1,4 @@
-package main
+package cmd
 
 const loginPage string = `<html>
 <head>

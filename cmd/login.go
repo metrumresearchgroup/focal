@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"encoding/json"
@@ -25,6 +25,7 @@ func loginProcessorController(w http.ResponseWriter, r *http.Request) {
 //The whole purpose is to provide a login mechanism for interactive avenues where a cookie will be used
 //This adheres to the chi authjwt model interactively
 func processFormLogin(w http.ResponseWriter, r *http.Request) {
+	config := GetConfig()
 	r.ParseForm()
 
 	Identity := tekmor.Identity{
@@ -50,7 +51,7 @@ func processFormLogin(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &Cewkie)
 
-	http.Redirect(w, r, rootURL+"/access", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, config.RootURL+"/access", http.StatusTemporaryRedirect)
 }
 
 func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
@@ -94,6 +95,7 @@ func proccessJSONLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func displayLoginController(w http.ResponseWriter, r *http.Request) {
+	config := GetConfig()
 
 	type Response struct {
 		Target string
@@ -106,6 +108,6 @@ func displayLoginController(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t.Execute(w, Response{
-		Target: rootURL + "/login",
+		Target: config.RootURL + "/login",
 	})
 }
