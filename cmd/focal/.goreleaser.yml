@@ -1,0 +1,83 @@
+# .goreleaser.yml
+
+before:
+  hooks:
+    - go mod tidy
+
+snapshot:
+  name_template: 1.{{.Commit}}
+
+builds:
+  -
+    id: "focal"
+    binary: focal
+    goos:
+      - linux
+    goarch:
+      - amd64
+    ignore:
+      - goos: darwin
+      - goos: windows
+
+nfpms:
+  # note that this is an array of nfpm configs
+  -
+    # ID of the nfpm config, must be unique.
+    # Defaults to "default".
+    id: "focal"
+    # You can change the name of the package.
+    # Default: `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}`
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
+    # Your app's vendor.
+    # Default is empty.
+    vendor: Metrum Research Group
+    # Your app's homepage.
+    # Default is empty.
+    homepage: https://metrumrg.com/
+
+    # Your app's maintainer (probably you).
+    # Default is empty.
+    maintainer: Darrell Breeden <darrellb@metrumrg.com>
+
+    # Your app's description.
+    # Default is empty.
+    description: A PAM authenticated, YML Configurable reverse proxy
+
+    # Your app's license.
+    # Default is empty.
+    license: MIT
+
+    # Formats to be generated.
+    formats:
+      - deb
+
+    # Packages your package depends on.
+    dependencies:
+      - build-essential
+      - libpam0g-dev
+      - bash
+
+    # Packages your package recommends installing.
+    # For RPM packages rpmbuild >= 4.13 is required
+    recommends:
+      - git
+
+    # Override default /usr/local/bin destination for binaries
+    bindir: /usr/local/bin
+
+    # Empty folders that should be created and managed by the packager
+    # implementation.
+    # Default is empty.
+    empty_folders:
+    - /var/log/focal
+
+    files:
+      "system/environment.file": "/etc/default/focal"
+      "system/focal.service": "/etc/systemd/system/focal.service"
+      "system/.example.directory.yml": "/etc/focal/directory.yml"
+      "system/focal.sh" : "/etc/init.d/focal"
+
+    scripts:
+      preinstall: "system/preinstall.sh"
+      postinstall: "system/postinstall.sh"

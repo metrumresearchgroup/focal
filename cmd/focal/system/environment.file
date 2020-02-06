@@ -1,0 +1,3 @@
+FOCAL_TOKEN_SECRET=changeme
+FOCAL_DIRECTORY_FILE=/etc/focal/directory.yml
+FOCAL_ROOT=
