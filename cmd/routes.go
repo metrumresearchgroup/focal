@@ -53,13 +53,15 @@ func Routes(directory Directions) chi.Router {
 
 func listingController(w http.ResponseWriter, r *http.Request) {
 
+	config := GetConfig()
+
 	type Request struct {
 		Directory Directions
 		RootURL   string
 	}
 
 
-	directory, _  := buildDirectory(&config)
+	directory, _  := buildDirectory(config)
 
 	req := Request{
 		Directory: directory,
