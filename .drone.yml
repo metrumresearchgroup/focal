@@ -20,15 +20,13 @@ steps:
     commands:
       - cd cmd/focal
       - go build
-    when:
-      event:
-        - tag
+      - rm focal
   - name: release
     image: focalreleaser
     pull: never
     commands:
       - cd cmd/focal
-      - goreleaser --skip-validate --skip-publish --rm-dist
+      - goreleaser --rm-dist
     when:
       event:
         - tag
