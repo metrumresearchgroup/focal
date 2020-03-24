@@ -5,7 +5,7 @@ before:
     - go mod tidy
 
 snapshot:
-  name_template: 1.{{.Commit}}
+  name_template: .{{ .Tag }}
 
 builds:
   -
@@ -18,7 +18,10 @@ builds:
     ignore:
       - goos: darwin
       - goos: windows
-
+archives:
+  -
+    id: focal-archive
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
 nfpms:
   # note that this is an array of nfpm configs
   -
