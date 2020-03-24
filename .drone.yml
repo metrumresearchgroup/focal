@@ -1,0 +1,35 @@
+---
+kind: pipeline
+name: focal_release
+type: docker
+
+steps:
+  - name: build core image
+    image: omerxx/drone-ecr-auth
+    volumes:
+      - name: docker.sock
+        path: /var/run/docker.sock
+    commands:
+      - docker build -t "focalreleaser" -f Dockerfiles/ubuntu-pam-devel.Dockerfile .
+  - name: build
+    image: focalreleaser
+    pull: never
+    commands:
+      - cd cmd/focal
+      - go build
+      - rm focal
+  - name: release
+    image: focalreleaser
+    pull: never
+    commands:
+      - cd cmd/focal
+      - goreleaser --rm-dist
+    when:
+      event:
+        - tag
+      status:
+        - success
+volumes:
+  - name: docker.sock
+    host:
+      path: /var/run/docker.sock
