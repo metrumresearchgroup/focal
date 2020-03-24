@@ -21,6 +21,9 @@ steps:
   - name: release
     image: focalreleaser
     pull: never
+    environment:
+      GITHUB_TOKEN:
+        from_secret: GITHUB_TOKEN
     commands:
       - cd cmd/focal
       - goreleaser --rm-dist
