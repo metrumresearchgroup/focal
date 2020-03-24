@@ -11,9 +11,6 @@ steps:
         path: /var/run/docker.sock
     commands:
       - docker build -t "focalreleaser" -f Dockerfiles/ubuntu-pam-devel.Dockerfile .
-    when:
-      event:
-          - tag
   - name: build
     image: focalreleaser
     pull: never
