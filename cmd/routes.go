@@ -142,6 +142,7 @@ func combinedJWTMiddleware(next http.Handler) http.Handler {
 			ctx := context.WithValue(r.Context(),"username", claims["username"])
 			updatedReq := r.WithContext(ctx)
 			next.ServeHTTP(w, updatedReq)
+			return
 		}
 
 		// Token is authenticated, pass it through
