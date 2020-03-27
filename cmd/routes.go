@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+	"github.com/dgrijalva/jwt-go"
 	"html/template"
 	"net/http"
 	"net/http/httputil"
@@ -106,6 +108,11 @@ func proxy(d Direction, w http.ResponseWriter, r *http.Request) {
 
 	proxy := httputil.NewSingleHostReverseProxy(u)
 
+	//Check for username in the context and create proxy webauth user header
+	if val, ok :=  r.Context().Value("username").(string); ok && val != "" {
+		r.Header.Add("X-WEBAUTH_USER",val)
+	}
+
 	proxy.ServeHTTP(w, r)
 
 }
@@ -128,6 +135,13 @@ func combinedJWTMiddleware(next http.Handler) http.Handler {
 
 		if token == nil || !token.Valid {
 			badAuthResponse(w, r)
+		}
+
+		//Get Username from claims
+		if claims, ok :=token.Claims.(jwt.MapClaims); ok && token.Valid {
+			ctx := context.WithValue(r.Context(),"username", claims["username"])
+			updatedReq := r.WithContext(ctx)
+			next.ServeHTTP(w, updatedReq)
 		}
 
 		// Token is authenticated, pass it through
