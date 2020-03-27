@@ -18,9 +18,9 @@ var configuration Config
 
 
 type Config struct {
-	Directory string `yaml:"directory_file" json:"directory_file,omitempty"`
+	Directory string `yaml:"directory" json:"directory,omitempty"`
 	Token string `yaml:"token" json:"token,omitempty"`
-	RootURL string `yaml:"root_url" json:"root_url,omitempty"`
+	RootURL string `mapstructure:"root_url" yaml:"root" json:"root,omitempty"`
 	Port int `yaml:"port" json:"port,omitempty"`
 }
 
@@ -39,8 +39,12 @@ var FocalCmd = &cobra.Command{
 	Example: `focal --token <token> --directory /path/to/directory.yml`,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		viper.SetEnvPrefix("focal")
+		viper.AutomaticEnv()
+
 
 		err := viper.Unmarshal(&configuration)
+
 
 		config := GetConfig()
 
@@ -77,6 +81,10 @@ func init(){
 	const portIdentifier string = "port"
 	FocalCmd.Flags().IntP(portIdentifier,"p",9666,"The port on which focal will run")
 	viper.BindPFlag(portIdentifier, FocalCmd.Flags().Lookup(portIdentifier))
+
+	const rootIdentifier string = "root_url"
+	FocalCmd.Flags().String(rootIdentifier, "/protected", "the root url on which Focal will reside.")
+	viper.BindPFlag(rootIdentifier, FocalCmd.Flags().Lookup(rootIdentifier))
 }
 
 
