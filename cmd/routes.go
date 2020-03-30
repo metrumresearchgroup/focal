@@ -110,7 +110,7 @@ func proxy(d Direction, w http.ResponseWriter, r *http.Request) {
 
 	//Check for username in the context and create proxy webauth user header
 	if val, ok :=  r.Context().Value("username").(string); ok && val != "" {
-		r.Header.Add("X-WEBAUTH_USER",val)
+		r.Header.Add("X-WEBAUTH-USER",val)
 	}
 
 	proxy.ServeHTTP(w, r)
