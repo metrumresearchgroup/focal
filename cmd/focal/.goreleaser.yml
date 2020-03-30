@@ -1,9 +1,5 @@
 # .goreleaser.yml
 
-before:
-  hooks:
-    - go mod tidy
-
 snapshot:
   name_template: .{{ .Tag }}
 
